@@ -21,6 +21,7 @@ func main() {
 	}
 	defer conn.Close()
 
+	//create
 	match := entities.Match{
 		MatchDescription: "皇马 VS 巴萨",
 		CreatedTime:      time.Now(),
@@ -33,19 +34,24 @@ func main() {
 	}
 	fmt.Println(match)
 
-	// stmt, err := conn.Prepare(`select top 1 * from tmatch`)
-	// if err != nil {
-	// 	log.Printf("\nPrepare failed:%T %+v\n", err, err)
+	//update
+	affectedNum, err := sqlmatch.UpdateMatch(entities.Match{MatchID: 4, MatchDescription: "11", IsDeleted: true}, conn)
+	if err != nil {
+		log.Fatal("CreateMatch failed:", err.Error())
+	}
+	fmt.Println("update success ", affectedNum)
 
-	// }
-	// //defer stmt.Close()
+	//query many
+	matchs, err := sqlmatch.QueryMatchs(conn)
+	if err != nil {
+		log.Fatal("QueryMatchs failed:", err.Error())
+	}
+	fmt.Println(matchs)
 
-	// row := stmt.QueryRow()
-	// // var somenumber int64
-	// // var somechars string
-	// err = row.Scan(&match.MatchID, &match.MatchDescription, &match.CreatedTime, &match.UpdatedTime, &match.IsDeleted)
-	// if err != nil {
-	// 	log.Fatal("Scan failed:", err.Error())
-	// }
-	// fmt.Println(match)
+	//query one
+	match, err = sqlmatch.QueryByMatchID(4, conn)
+	if err != nil {
+		log.Fatal("QueryByMatchID failed:", err.Error())
+	}
+	fmt.Println(match)
 }
