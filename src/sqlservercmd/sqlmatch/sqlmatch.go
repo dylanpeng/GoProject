@@ -5,8 +5,6 @@ import (
 	"entities"
 	"fmt"
 	"time"
-
-	_ "github.com/denisenkom/go-mssqldb"
 )
 
 //Create a new match
