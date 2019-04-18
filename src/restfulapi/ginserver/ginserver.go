@@ -2,6 +2,8 @@ package main
 
 import (
 	"entities"
+	"fmt"
+	"mysqlorm/mysqlgorm"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,8 +31,18 @@ func main() {
 	//GET请求通过正常的URL获取参数  /getuser?id=2
 	r.GET("/getuser", func(c *gin.Context) {
 		rid := c.DefaultQuery("id", "1")
-		id, _ := strconv.ParseInt(rid, 10, 64)
-		user := entities.User{ID: id, Age: 32, CreatedTime: time.Now(), UpdatedTime: time.Now(), IsDeleted: true}
+		id, err := strconv.ParseInt(rid, 10, 64)
+		if err != nil {
+			fmt.Println("getuser badrequest error:" + err.Error())
+			c.String(http.StatusBadRequest, "bad request param")
+			return
+		}
+		user, err := mysqlgorm.QueryUser(id)
+		if err != nil {
+			fmt.Println("QueryUser error:" + err.Error())
+			c.String(http.StatusBadRequest, "QueryUser error, please contact administrator")
+			return
+		}
 		c.JSON(http.StatusOK, user)
 	})
 
@@ -38,11 +50,15 @@ func main() {
 	r.POST("/adduser", func(c *gin.Context) {
 		var user entities.User
 		err := c.ShouldBind(&user)
-		if err == nil {
-			c.JSON(http.StatusOK, user)
-		} else {
-			c.String(http.StatusBadRequest, "请求参数错误", err)
+		user.ID = 0
+		user.CreatedTime = time.Now()
+		user.UpdatedTime = time.Now()
+		if err != nil {
+			c.String(http.StatusBadRequest, "Bad Requst", err)
+			return
 		}
+		mysqlgorm.CreateUser(&user)
+		c.JSON(http.StatusOK, user)
 	})
 
 	r.Run(":9002") // listen and serve on 0.0.0.0:8080
