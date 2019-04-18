@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID          int64     `gorm:"column:ID;primary_key;auto_increment"`
+	ID          int64     `gorm:"column:ID;primary_key;auto_increment" form:"ID"`
 	Name        string    `gorm:"column:Name"`
 	Age         int       `gorm:"column:Age"`
 	CreatedTime time.Time `gorm:"column:CreatedTime"`
