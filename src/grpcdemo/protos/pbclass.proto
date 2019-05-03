@@ -1,0 +1,25 @@
+syntax = "proto3";
+ 
+enum UserStatus {
+    OFFLINE = 0;
+    ONLINE = 1;
+ }
+ 
+message UserInfo {
+  int32 id = 1; 
+  string name = 2; 
+  UserStatus status = 3 ;
+}
+ 
+message UserID {
+  int32 id = 1; 
+}
+ 
+message funcResponse {    
+   string reply = 1;
+}
+ 
+service UserService {
+  rpc Login(UserInfo) returns (funcResponse){};
+  rpc logout(UserID) returns (funcResponse){};
+}
