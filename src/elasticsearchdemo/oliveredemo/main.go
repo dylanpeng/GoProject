@@ -52,7 +52,9 @@ func main() {
 		fmt.Printf("search es data failed | err : %s\n", err)
 		return
 	}
-	fmt.Printf("get rep : %s\n", searchRep.Hits.Hits[0].Source)
+	if len(searchRep.Hits.Hits) > 0 {
+		fmt.Printf("get rep : %s\n", searchRep.Hits.Hits[0].Source)
+	}
 
 	//删除es数据
 	delRep, err := deleteESItem(nearbyObj.Id)
