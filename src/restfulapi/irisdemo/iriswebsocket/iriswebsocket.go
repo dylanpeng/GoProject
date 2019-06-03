@@ -11,7 +11,7 @@ func main() {
 	app := iris.New()
 
 	app.Get("/", func(ctx iris.Context) {
-		ctx.ServeFile("websockets.html", false) // second parameter: enable gzip?
+		ctx.ServeFile("/Users/chenpeng/working/GoProject/src/restfulapi/irisdemo/iriswebsocket/websockets.html", false) // second parameter: enable gzip?
 	})
 
 	setupWebsocket(app)
@@ -20,7 +20,7 @@ func main() {
 	// http://localhost:8080
 	// http://localhost:8080
 	// write something, press submit, see the result.
-	app.Run(iris.Addr(":8081"))
+	app.Run(iris.Addr(":8080"))
 }
 
 func setupWebsocket(app *iris.Application) {
@@ -49,5 +49,10 @@ func handleConnection(c websocket.Connection) {
 		// c.Emit("chat", msg)
 		// Write message to all except this client with:
 		c.To(websocket.Broadcast).Emit("chat", msg)
+	})
+
+	c.OnMessage(func(message []byte){
+		fmt.Printf("%s sent: %s\n", c.Context().RemoteAddr(), message)
+		c.To(websocket.Broadcast).EmitMessage(message)
 	})
 }

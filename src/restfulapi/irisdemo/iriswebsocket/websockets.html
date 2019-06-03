@@ -31,12 +31,17 @@ at this example we registered the 'chat' -->
 
     // read events from the server
     socket.On("chat", function (msg) {
-        addMessage(msg);
+        addMessage("chat:" + msg);
+    });
+
+    socket.OnMessage(function (msg) {
+        addMessage("message:" + msg);
     });
 
     function send() {
         addMessage("Me: " + input.value); // write ourselves
         socket.Emit("chat", input.value); // send chat event data to the websocket server
+        socket.EmitMessage(input.value); // send chat event data to the websocket server
         input.value = ""; // clear the input
     }
 
