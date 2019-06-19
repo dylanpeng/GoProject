@@ -124,6 +124,7 @@ func deleteESItem(id string) (rep *elastic.DeleteResponse, err error) {
 	return
 }
 
+//根据geo距离及分词查询
 func QueryElasticSearch(name, lat, lng string, pageSize int) {
 	floatLat, err := strconv.ParseFloat(lat, 64)
 	if err != nil {

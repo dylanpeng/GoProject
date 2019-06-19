@@ -3,16 +3,16 @@ package entities
 import "fmt"
 
 type Result struct {
-	Geometry  Geometry `json:"geometry"`
-	Icon      string   `json:"icon"`
-	Id        string   `json:"id"`
-	Name      string   `json:"name"`
-	Photos    []*Photo `json:"photos"`
-	PlaceId   string   `json:"place_id"`
-	Reference string   `json:"reference"`
-	Scope     string   `json:"scope"`
-	Types     []string `json:"types"`
-	Vicinity  string   `json:"vicinity"`
+	Geometry       Geometry       `json:"geometry"`
+	Icon           string         `json:"icon"`
+	Id             string         `json:"id"`
+	Name           string         `json:"name"`
+	Photos         []*Photo       `json:"photos"`
+	PlaceId        string         `json:"place_id"`
+	Reference      string         `json:"reference"`
+	Scope          string         `json:"scope"`
+	Types          []string       `json:"types"`
+	Vicinity       string         `json:"vicinity"`
 	LocationSearch LocationSearch `json:"location_search"`
 }
 
