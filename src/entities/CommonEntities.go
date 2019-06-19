@@ -13,6 +13,7 @@ type Result struct {
 	Scope     string   `json:"scope"`
 	Types     []string `json:"types"`
 	Vicinity  string   `json:"vicinity"`
+	LocationSearch LocationSearch `json:"location_search"`
 }
 
 func (e *Result) String() string {
@@ -34,6 +35,15 @@ type Location struct {
 }
 
 func (e *Location) String() string {
+	return fmt.Sprintf("%+v", *e)
+}
+
+type LocationSearch struct {
+	Lat float64 `json:"lat"`
+	Lon float64 `json:"lon"`
+}
+
+func (e *LocationSearch) String() string {
 	return fmt.Sprintf("%+v", *e)
 }
 

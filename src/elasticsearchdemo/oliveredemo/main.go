@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"entities"
 	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/olivere/elastic"
 )
@@ -32,7 +35,7 @@ func main() {
 
 	//根据id获取es数据
 	getRep, err := getESItem(nearbyObj.Id)
-	if err != nil{
+	if err != nil {
 		fmt.Printf("get es data failed | err : %s\n", err)
 		return
 	}
@@ -48,7 +51,7 @@ func main() {
 
 	//根据条件查询es数据
 	searchRep, err := searchESItem()
-	if err != nil{
+	if err != nil {
 		fmt.Printf("search es data failed | err : %s\n", err)
 		return
 	}
@@ -103,7 +106,7 @@ func getESItem(id string) (rep *elastic.GetResult, err error) {
 }
 
 //查询
-func searchESItem()(rep *elastic.SearchResult, err error){
+func searchESItem() (rep *elastic.SearchResult, err error) {
 	q := elastic.NewQueryStringQuery("icon:ccc")
 	rep, err = client.Search("poi").
 		Query(q).
@@ -118,5 +121,50 @@ func deleteESItem(id string) (rep *elastic.DeleteResponse, err error) {
 		Index("poi").
 		Id(id).
 		Do(context.Background())
+	return
+}
+
+func QueryElasticSearch(name, lat, lng string, pageSize int) {
+	floatLat, err := strconv.ParseFloat(lat, 64)
+	if err != nil {
+		return
+	}
+
+	floatLng, err := strconv.ParseFloat(lng, 64)
+	if err != nil {
+		return
+	}
+
+	names := strings.Fields(name)
+
+	//bool 查询
+	boolSearch := elastic.NewBoolQuery()
+	//查询距离点floatLat,floatLng 20km以内的点
+	boolSearch.Filter(elastic.NewGeoDistanceQuery("location_search").Distance("20km").Lat(floatLat).Lon(floatLng))
+	//分词匹配name vicinity两个属性，should相当于"或"
+	mustSearch := elastic.NewBoolQuery()
+	for _, data := range names {
+		mustSearch.Should(elastic.NewMatchQuery("name", data))
+		mustSearch.Should(elastic.NewMatchQuery("vicinity", data))
+	}
+	//must相当于"并"
+	boolSearch.Must(mustSearch)
+	res, err := client.Search("poi").
+		Query(boolSearch).
+		From(0).
+		Size(pageSize).
+		SortBy(elastic.NewGeoDistanceSort("location_search").Point(floatLat, floatLng)).
+		Do(context.Background())
+
+	if err != nil {
+		return
+	}
+
+	var typ *entities.Result
+	//遍历命中的数据，对数据进行类型断言，获取数据
+	for _, item := range res.Each(reflect.TypeOf(typ)) {
+		result := item.(*entities.Result)
+		fmt.Println(result)
+	}
 	return
 }
